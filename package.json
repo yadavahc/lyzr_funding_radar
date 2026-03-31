@@ -1,0 +1,36 @@
+{
+  "name": "lyzr-funding-radar",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "AI Funding Radar - Discover, extract, and analyze recently funded AI developer tool startups using Lyzr and Qdrant",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.27",
+    "axios": "^1.14.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "google-auth-library": "^10.6.2",
+    "googleapis": "^171.4.0",
+    "next": "^15.3.0",
+    "openai": "^6.33.0",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "uuid": "^13.0.0"
+  }
+}
