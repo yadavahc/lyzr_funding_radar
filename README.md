@@ -2,15 +2,27 @@
 
 **Autonomous LLM agent for AI startup funding discovery, extraction, and semantic search.**
 
+## Screenshots
+
+### Qdrant Cloud - API Keys Setup
+
+![Qdrant API Keys](images/screenshots/qdrant-api-keys.png)
+_Qdrant Cloud cluster with API keys for vector database access_
+
+### Google Sheets - Data Export
+
+![Google Sheets Data](images/screenshots/google-sheets-data.png)
+_Automated export of extracted startup funding data to Google Sheets_
+
 ## Tech Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **Frontend** | Next.js | 16.2.1 |
-| **Backend** | Node.js + TypeScript | 18+ |
-| **Vector DB** | Qdrant | Cloud/Local |
-| **LLM** | GPT-4o-mini | text-embedding-3-small |
-| **Styling** | Tailwind CSS | 3.x |
+| Layer         | Technology           | Version                |
+| ------------- | -------------------- | ---------------------- |
+| **Frontend**  | Next.js              | 16.2.1                 |
+| **Backend**   | Node.js + TypeScript | 18+                    |
+| **Vector DB** | Qdrant               | Cloud/Local            |
+| **LLM**       | GPT-4o-mini          | text-embedding-3-small |
+| **Styling**   | Tailwind CSS         | 3.x                    |
 
 ## Setup
 
@@ -41,25 +53,25 @@ Articles → GPT-4o-mini Extract → text-embedding-3-small
 
 ## API Endpoints
 
-| Method | Endpoint | Body | Response |
-|--------|----------|------|----------|
-| `POST` | `/api/fetch-and-extract` | — | `{ inserted, duplicates, errors }` |
-| `POST` | `/api/search` | `{ query, limit }` | `{ results: [{startup, similarity_score}] }` |
-| `GET` | `/api/startups` | `?page=1&pageSize=20` | `{ data, total, hasMore }` |
-| `GET` | `/api/stats` | — | `{ totalCompanies, topCategory, ... }` |
-| `GET` | `/api/trending` | `?days=7` | `{ data: [StartupData] }` |
+| Method | Endpoint                 | Body                  | Response                                     |
+| ------ | ------------------------ | --------------------- | -------------------------------------------- |
+| `POST` | `/api/fetch-and-extract` | —                     | `{ inserted, duplicates, errors }`           |
+| `POST` | `/api/search`            | `{ query, limit }`    | `{ results: [{startup, similarity_score}] }` |
+| `GET`  | `/api/startups`          | `?page=1&pageSize=20` | `{ data, total, hasMore }`                   |
+| `GET`  | `/api/stats`             | —                     | `{ totalCompanies, topCategory, ... }`       |
+| `GET`  | `/api/trending`          | `?days=7`             | `{ data: [StartupData] }`                    |
 
 ## Data Model
 
 ```typescript
 interface StartupData {
-  name: string
-  founders: string[]
-  fundingAmount: number
-  fundingRound: "Seed" | "Series A-D" | "Strategic"
-  category: "AI Infra" | "AI Dev Tools" | "LLM Tools" | "Agent Platform"
-  article_source: string
-  extracted_at: Date
+  name: string;
+  founders: string[];
+  fundingAmount: number;
+  fundingRound: "Seed" | "Series A-D" | "Strategic";
+  category: "AI Infra" | "AI Dev Tools" | "LLM Tools" | "Agent Platform";
+  article_source: string;
+  extracted_at: Date;
 }
 ```
 
@@ -142,14 +154,14 @@ GOOGLE_CLIENT_ID=...
 
 ## Performance
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Article fetch | 50ms | I/O |
+| Operation      | Time  | Notes                |
+| -------------- | ----- | -------------------- |
+| Article fetch  | 50ms  | I/O                  |
 | LLM extraction | 400ms | ⚠️ OpenAI bottleneck |
-| Embedding | 50ms | I/O |
-| Qdrant search | 10ms | HNSW index |
-| Qdrant insert | 5ms | Storage |
-| Sheets sync | 2s | Async (non-blocking) |
+| Embedding      | 50ms  | I/O                  |
+| Qdrant search  | 10ms  | HNSW index           |
+| Qdrant insert  | 5ms   | Storage              |
+| Sheets sync    | 2s    | Async (non-blocking) |
 
 ## Error Handling
 
@@ -191,11 +203,13 @@ curl "http://localhost:3000/api/startups?page=1&pageSize=10"
 ## Deployment
 
 ### Vercel
+
 ```bash
 npm run build && vercel deploy
 ```
 
 ### Docker
+
 ```bash
 docker build -t funding-radar .
 docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... -e QDRANT_URL=... funding-radar
@@ -203,22 +217,22 @@ docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... -e QDRANT_URL=... funding-radar
 
 ## Troubleshooting
 
-| Error | Solution |
-|-------|----------|
-| Qdrant 404 | Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant:latest` |
-| OpenAI 401 | Verify `OPENAI_API_KEY` at https://platform.openai.com |
-| No startups | Click "Fetch & Extract" button, check terminal logs |
-| Slow extraction | Normal: 2-3s/article. Check OpenAI rate limits. |
-| Sheets sync fail | Check service account share permissions; pipeline continues |
+| Error            | Solution                                                     |
+| ---------------- | ------------------------------------------------------------ |
+| Qdrant 404       | Start Qdrant: `docker run -p 6333:6333 qdrant/qdrant:latest` |
+| OpenAI 401       | Verify `OPENAI_API_KEY` at https://platform.openai.com       |
+| No startups      | Click "Fetch & Extract" button, check terminal logs          |
+| Slow extraction  | Normal: 2-3s/article. Check OpenAI rate limits.              |
+| Sheets sync fail | Check service account share permissions; pipeline continues  |
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `lib/openai.ts` | Embeddings + LLM extraction |
-| `lib/qdrant.ts` | Vector DB ops (search, insert, dedup) |
-| `pages/api/fetch-and-extract.ts` | Main pipeline orchestration |
-| `lib/sample-data.ts` | 7 real AI company articles |
+| File                             | Purpose                               |
+| -------------------------------- | ------------------------------------- |
+| `lib/openai.ts`                  | Embeddings + LLM extraction           |
+| `lib/qdrant.ts`                  | Vector DB ops (search, insert, dedup) |
+| `pages/api/fetch-and-extract.ts` | Main pipeline orchestration           |
+| `lib/sample-data.ts`             | 7 real AI company articles            |
 
 ## Features
 
@@ -233,12 +247,15 @@ docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... -e QDRANT_URL=... funding-radar
 ## Configuration
 
 ### Adjust extraction timeout
+
 `pages/api/fetch-and-extract.ts` → `CONFIG.EXTRACTION_TIMEOUT_MS`
 
 ### Adjust similarity threshold
+
 `lib/qdrant.ts` → `SIMILARITY_THRESHOLD`
 
 ### Add data sources
+
 Edit `lib/sample-data.ts` articles array
 
 ## License
