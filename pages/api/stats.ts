@@ -5,7 +5,7 @@ import {
   getCollectionStats,
   getAllStartups,
   getTrendingStartups,
-} from "@/lib/qdrant";
+} from "@/lib/mock-db";
 import { DashboardStats } from "@/types/index";
 
 export default async function handler(

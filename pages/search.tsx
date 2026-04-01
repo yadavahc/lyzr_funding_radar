@@ -1,7 +1,13 @@
 import { useState, FormEvent } from "react";
-import Link from "next/link";
-import LoadingStatus from "@/components/LoadingStatus";
+import { motion, AnimatePresence } from "framer-motion";
+import Layout from "@/components/Layout";
+import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import { SearchResult } from "@/types/index";
+import { Search, Sparkles, ExternalLink, TrendingUp, Users, DollarSign } from "lucide-react";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -41,138 +47,203 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">🔍 Search</h1>
-              <p className="text-gray-500 mt-1">Find similar startups</p>
-            </div>
-            <nav className="flex gap-4">
-              <Link href="/">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900">
-                  Dashboard
-                </button>
-              </Link>
-              <Link href="/search">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900 border-b-2 border-blue-600">
-                  Search
-                </button>
-              </Link>
-              <Link href="/startups">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900">
-                  All Startups
-                </button>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <Layout>
+      <Container size="md">
+        {/* Hero Section */}
+        <Section padding="lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-4 text-center"
+          >
+            <Badge variant="primary" size="md" icon={<Sparkles className="h-3.5 w-3.5" />}>
+              AI-Powered Search
+            </Badge>
+            
+            <h1 className="text-4xl lg:text-5xl font-bold text-white">
+              Smart Search
+            </h1>
+            
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              Find similar startups using AI-powered semantic search
+            </p>
+          </motion.div>
+        </Section>
 
-      {/* Main */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search Form */}
-        <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search for a startup (e.g., 'AI inference platform')"
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-semibold"
-            >
-              {loading ? "Searching..." : "Search"}
-            </button>
-          </div>
-        </form>
+        <Section padding="md">
+          <motion.form
+            onSubmit={handleSearch}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card variant="gradient" padding="sm">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search for a startup (e.g., 'AI inference platform')"
+                    className="w-full pl-12 pr-4 py-3 bg-black/40 text-white placeholder-gray-500 rounded-lg border border-white/10 focus:border-violet-500/50 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  variant="primary"
+                  size="lg"
+                  loading={loading}
+                >
+                  <Search className="h-4 w-4" />
+                  Search
+                </Button>
+              </div>
+            </Card>
+          </motion.form>
+        </Section>
 
+        {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            ❌ {error}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card variant="bordered" className="border-red-500/30 bg-red-500/10">
+              <p className="text-sm text-red-200">❌ {error}</p>
+            </Card>
+          </motion.div>
         )}
 
         {/* Results */}
-        {searched && (
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Similar Startups ({results.length})
-            </h2>
+        <Section padding="md">
+          <AnimatePresence mode="wait">
+            {searched ? (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                    <TrendingUp className="h-6 w-6 text-violet-400" />
+                    Similar Startups
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    Found {results.length} {results.length === 1 ? 'result' : 'results'}
+                  </p>
+                </div>
 
-            {results.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                No similar startups found. Try a different search term.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {results.map((result, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          {result.company.companyName}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Founders: {result.company.founderNames?.join(", ") || "-"}
-                        </p>
-                      </div>
-                      <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                        {(result.similarity * 100).toFixed(1)}% match
-                      </span>
+                {results.length === 0 ? (
+                  <Card padding="lg">
+                    <div className="text-center py-12">
+                      <Search className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-400 text-lg">No similar startups found.</p>
+                      <p className="text-gray-500 text-sm mt-2">Try a different search term</p>
                     </div>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {results.map((result, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                      >
+                        <Card variant="gradient" hover padding="lg" className="relative overflow-visible">
+                          {/* Match Badge */}
+                          <div className="absolute -top-3 right-6">
+                            <Badge variant="success" size="md">
+                              {(result.similarity * 100).toFixed(1)}% match
+                            </Badge>
+                          </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-3">
-                      <div>
-                        <p className="text-xs text-gray-500 uppercase">Funding</p>
-                        <p className="font-semibold text-gray-900">
-                          {result.company.fundingTotal}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 uppercase">Category</p>
-                        <p className="font-semibold text-gray-900">
-                          {result.company.category}
-                        </p>
-                      </div>
-                    </div>
+                          <div className="space-y-4">
+                            {/* Company Name */}
+                            <div>
+                              <h3 className="text-xl font-bold text-white mb-2">
+                                {result.company.companyName}
+                              </h3>
+                              <div className="flex items-center gap-2 text-sm text-gray-400">
+                                <Users className="h-4 w-4" />
+                                <span>Founders: {result.company.founderNames?.join(", ") || "N/A"}</span>
+                              </div>
+                            </div>
 
-                    <a
-                      href={result.company.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      View Source →
-                    </a>
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                                  Funding Total
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <DollarSign className="h-4 w-4 text-emerald-400" />
+                                  <p className="text-lg font-bold text-emerald-400">
+                                    {result.company.fundingTotal}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="space-y-1">
+                                <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                                  Category
+                                </p>
+                                <Badge variant="primary" size="sm">
+                                  {result.company.category}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            {/* Source Link */}
+                            <a
+                              href={result.company.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 text-sm font-medium transition-colors group"
+                            >
+                              <span>View Source</span>
+                              <ExternalLink className="h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                            </a>
+                          </div>
+                        </Card>
+                      </motion.div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                )}
+              </motion.div>
+            ) : !loading && (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <Card padding="lg">
+                  <div className="text-center py-12">
+                    <div className="p-4 rounded-full bg-violet-500/10 w-fit mx-auto mb-4">
+                      <Search className="h-8 w-8 text-violet-400" />
+                    </div>
+                    <p className="text-white text-lg font-medium mb-2">
+                      Enter a query above to find similar startups
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Try searching for{" "}
+                      <span className="text-violet-400 font-semibold">"LLM"</span>,{" "}
+                      <span className="text-violet-400 font-semibold">"AI inference"</span>, or{" "}
+                      <span className="text-violet-400 font-semibold">"Agent platform"</span>
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
             )}
-          </div>
-        )}
-
-        {!searched && !loading && (
-          <div className="bg-white rounded-lg shadow p-12 text-center text-gray-500">
-            <p className="text-lg">Enter a query above to find similar startups</p>
-            <p className="text-sm mt-2">
-              Try searching for company types, technologies, or terms like
-              "LLM", "AI inference", "Agent platform", etc.
-            </p>
-          </div>
-        )}
-      </main>
-
-      <LoadingStatus isLoading={loading} status="Searching..." />
-    </div>
+          </AnimatePresence>
+        </Section>
+      </Container>
+    </Layout>
   );
 }

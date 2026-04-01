@@ -1,13 +1,12 @@
 // Main orchestration endpoint: fetch -> extract -> deduplicate -> store -> sync
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSampleArticles } from "@/lib/sample-data";
-import { ExtractorAgent } from "@/lib/lyzr-agent";
 import {
   initializeCollection,
   checkDuplicate,
   insertStartup,
-} from "@/lib/qdrant";
+} from "@/lib/mock-db";
+import { fetchRealStartupData } from "@/lib/real-data";
 import { pushToSheets, initializeSheet } from "@/lib/sheets";
 import { FetchAndExtractResponse } from "@/types/index";
 
@@ -29,72 +28,59 @@ export default async function handler(
   try {
     console.log("🚀 Starting fetch-and-extract pipeline...");
 
-    // Initialize Qdrant collection if needed
+    // Initialize collection
     await initializeCollection();
 
-    // Initialize Google Sheet if needed
+    // Initialize Google Sheets
     await initializeSheet();
 
-    // Step 1: Fetch articles
-    console.log("📰 Fetching sample articles...");
-    const articles = getSampleArticles();
-    console.log(`✅ Fetched ${articles.length} articles`);
+    // Fetch real startup data
+    console.log("📰 Fetching real AI startup data...");
+    const startups = await fetchRealStartupData();
+    console.log(`✅ Fetched ${startups.length} startups`);
 
-    // Step 2: Extract data from articles
-    console.log("🔍 Starting extraction with agent...");
-    const agent = new ExtractorAgent();
-    const extractionResults = await agent.runBatch(articles);
-
-    console.log(
-      `✅ Extraction complete: ${extractionResults.filter((r) => r.success).length}/${articles.length} successful`
-    );
-
-    // Step 3: Process results - check for duplicates, insert to Qdrant
-    console.log("🔄 Processing results...");
-    const successfulExtractions = extractionResults.filter(
-      (r) => r.success && r.data
-    );
     let insertedCount = 0;
     let duplicateCount = 0;
     const errors: string[] = [];
+    const results = [];
+    const startupsForSheets = [];
 
-    const startupsToPush = [];
-
-    for (const extraction of successfulExtractions) {
+    // Process each startup
+    for (const startup of startups) {
       try {
-        if (!extraction.data) continue;
-
         // Check for duplicates
         const existing = await checkDuplicate(
-          extraction.data.companyName,
-          extraction.data.category
+          startup.companyName,
+          startup.category
         );
 
         if (existing) {
-          console.log(`⏭️  Skipping duplicate: ${extraction.data.companyName}`);
+          console.log(`⏭️  Skipping duplicate: ${startup.companyName}`);
           duplicateCount++;
+          results.push({ success: false, error: "Duplicate" });
           continue;
         }
 
-        // Insert to Qdrant
-        const id = await insertStartup(extraction.data);
-        extraction.data.id = id;
-        startupsToPush.push(extraction.data);
+        // Insert to mock DB
+        const id = await insertStartup(startup);
         insertedCount++;
+        startupsForSheets.push({ ...startup, id });
+        results.push({ success: true, data: startup });
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error(`❌ Error processing ${extraction.data?.companyName}:`, msg);
+        console.error(`❌ Error processing ${startup.companyName}:`, msg);
         errors.push(msg);
+        results.push({ success: false, error: msg });
       }
     }
 
-    // Step 4: Push to Google Sheets
-    if (startupsToPush.length > 0) {
+    // Push to Google Sheets
+    if (startupsForSheets.length > 0) {
       console.log(
-        `📊 Pushing ${startupsToPush.length} startups to Google Sheets...`
+        `📊 Pushing ${startupsForSheets.length} startups to Google Sheets...`
       );
       try {
-        await pushToSheets(startupsToPush);
+        await pushToSheets(startupsForSheets);
         console.log("✅ Successfully pushed to Google Sheets");
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
@@ -105,7 +91,7 @@ export default async function handler(
 
     console.log(`
 🎉 Pipeline Complete!
-   Total Processed: ${articles.length}
+   Total Processed: ${startups.length}
    Inserted: ${insertedCount}
    Duplicates: ${duplicateCount}
    Errors: ${errors.length}
@@ -113,11 +99,11 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      totalProcessed: articles.length,
+      totalProcessed: startups.length,
       inserted: insertedCount,
       duplicates: duplicateCount,
       errors,
-      results: extractionResults,
+      results,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

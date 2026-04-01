@@ -1,7 +1,7 @@
 // Get all startups with pagination
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getAllStartups } from "@/lib/qdrant";
+import { getAllStartups } from "@/lib/mock-db";
 import { PaginatedResponse, StartupData } from "@/types/index";
 
 export default async function handler(
