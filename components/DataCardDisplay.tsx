@@ -60,7 +60,7 @@ export default function DataCardDisplay({
     return (
       <div className={`grid ${columnMap[columns as keyof typeof columnMap]} ${gapMap[gap]}`}>
         {[1, 2, 3, 4].map((i) => (
-          <GlassCard key={i} gradient="indigo">
+          <GlassCard key={i} variant="gradient">
             <div className="h-40 bg-gradient-to-br from-white/10 to-white/5 rounded-lg animate-pulse" />
           </GlassCard>
         ))}
@@ -78,7 +78,7 @@ export default function DataCardDisplay({
       {items.map((card) => (
         <motion.div key={card.id} variants={item}>
           <GlassCard
-            gradient={card.gradient || "indigo"}
+            variant={card.gradient ? "gradient" : "default"}
             motionProps={{
               whileHover: { scale: 1.02 },
             }}
