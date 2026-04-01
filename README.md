@@ -2,18 +2,6 @@
 
 **Autonomous LLM agent for AI startup funding discovery, extraction, and semantic search.**
 
-## Screenshots
-
-### Qdrant Cloud - API Keys Setup
-
-![Qdrant API Keys](images/screenshots/qdrant-api-keys.png)
-_Qdrant Cloud cluster with API keys for vector database access_
-
-### Google Sheets - Data Export
-
-![Google Sheets Data](images/screenshots/google-sheets-data.png)
-_Automated export of extracted startup funding data to Google Sheets_
-
 ## Tech Stack
 
 | Layer         | Technology           | Version                |
