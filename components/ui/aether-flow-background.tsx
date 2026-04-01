@@ -45,10 +45,10 @@ const AetherFlowBackground: React.FC<AetherFlowBackgroundProps> = ({ children })
       }
 
       update() {
-        if (this.x > canvas.width || this.x < 0) {
+        if (this.x > canvas!.width || this.x < 0) {
           this.directionX = -this.directionX;
         }
-        if (this.y > canvas.height || this.y < 0) {
+        if (this.y > canvas!.height || this.y < 0) {
           this.directionY = -this.directionY;
         }
 
@@ -73,7 +73,7 @@ const AetherFlowBackground: React.FC<AetherFlowBackgroundProps> = ({ children })
 
     function init() {
       particles = [];
-      let numberOfParticles = (canvas.height * canvas.width) / 9000;
+      let numberOfParticles = (canvas!.height * canvas!.width) / 9000;
       for (let i = 0; i < numberOfParticles; i++) {
         let size = (Math.random() * 2) + 1;
         let x = (Math.random() * ((window.innerWidth - size * 2) - (size * 2)) + size * 2);
@@ -86,8 +86,8 @@ const AetherFlowBackground: React.FC<AetherFlowBackgroundProps> = ({ children })
     }
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas!.width = window.innerWidth;
+      canvas!.height = window.innerHeight;
       init();
     };
     
@@ -101,7 +101,7 @@ const AetherFlowBackground: React.FC<AetherFlowBackgroundProps> = ({ children })
           let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
             + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
 
-          if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+          if (distance < (canvas!.width / 7) * (canvas!.height / 7)) {
             opacityValue = 1 - (distance / 20000);
 
             let dx_mouse_a = particles[a].x - (mouse.x || 0);
