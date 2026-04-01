@@ -4,11 +4,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Zap } from 'lucide-react';
 
-// A utility function for class names
-const cn = (...classes: (string | undefined | null | false)[]) =>
-  classes.filter(Boolean).join(' ');
-
-// The main hero component
 const AetherFlowHero = () => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
@@ -49,10 +44,10 @@ const AetherFlowHero = () => {
             }
 
             update() {
-                if (this.x > canvas.width || this.x < 0) {
+                if (this.x > canvas!.width || this.x < 0) {
                     this.directionX = -this.directionX;
                 }
-                if (this.y > canvas.height || this.y < 0) {
+                if (this.y > canvas!.height || this.y < 0) {
                     this.directionY = -this.directionY;
                 }
 
@@ -78,7 +73,7 @@ const AetherFlowHero = () => {
 
         function init() {
             particles = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            let numberOfParticles = (canvas!.height * canvas!.width) / 9000;
             for (let i = 0; i < numberOfParticles; i++) {
                 let size = (Math.random() * 2) + 1;
                 let x = (Math.random() * ((window.innerWidth - size * 2) - (size * 2)) + size * 2);
@@ -91,8 +86,8 @@ const AetherFlowHero = () => {
         }
 
         const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvas!.width = window.innerWidth;
+            canvas!.height = window.innerHeight;
             init();
         };
         window.addEventListener('resize', resizeCanvas);
@@ -105,7 +100,7 @@ const AetherFlowHero = () => {
                     let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
                         + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
 
-                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                    if (distance < (canvas!.width / 7) * (canvas!.height / 7)) {
                         opacityValue = 1 - (distance / 20000);
 
                         let dx_mouse_a = particles[a].x - (mouse.x || 0);
